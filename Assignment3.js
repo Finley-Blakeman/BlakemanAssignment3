@@ -16,7 +16,7 @@ var render, canvas, gl;
 //global rotation variables
 var theta = 0.0;
 var thetaLoc;
-var speed;
+var moveGem = false;
 
 //global color and point variables
 var colors = [];
@@ -29,9 +29,8 @@ var programGem7;
 
 var drawGem5 = true;
 var drawGem6 = false;
-var drawGem7 = false;
 
-function drawGem5() 
+function loadGem5() 
 {
   points = [
     vec2(0, 0),
@@ -78,7 +77,7 @@ function drawGem5()
   gl.enableVertexAttribArray(positionLoc);
 }
 
-function drawGem6() 
+function loadGem6() 
 {
   points = [
     vec2(0, 0),
@@ -126,7 +125,7 @@ function drawGem6()
   gl.enableVertexAttribArray(positionLoc);
 }
 
-function drawGem7() 
+function loadGem7() 
 {
   points = [
     vec2(0, 0),
@@ -177,24 +176,77 @@ function drawGem7()
 
 window.onload = function init()
 {
-    //Set up webpage
-    canvas = document.getElementById("gl-canvas");
-    gl = canvas.getContext('webgl2');
-    if(!gl) alert("WebGL 2.0 isn't available");
+  //Set up webpage
+  canvas = document.getElementById("gl-canvas");
+  gl = canvas.getContext('webgl2');
+  if(!gl) alert("WebGL 2.0 isn't available");
+  
 
-    //Configure background of canvas
-    gl.viewport(0, 0, canvas.Width, canvas.height);
-    gl.clearColor(0.8, 0.8, 0.8, 1.0);
+  //Configure background of canvas
+  gl.viewport(0, 0, canvas.Width, canvas.height);
+  gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
-    //Load Shaders and initialize attribute buffers
-    //Establish shaders (programs), button, menu, and speed (theta)
-    
-    render();
+
+  //Load Shaders and initialize attribute buffers
+  programGem5 = initShaders(gl, "vertex-shader-5", "fragment-shader");
+  gl.useProgram(programGem5);
+
+
+  //Starting the program with the 5-sided gem loaded on the screen
+  loadGem5();
+
+
+  //Establish shaders (programs), button, menu, and thetaLoc
+
+  //Establish shaders (programs)
+  programGem5 = initShaders(gl, "vertex-shader-5", "fragment-shader");
+  programGem6 = initShaders(gl, "vertex-shader-6", "fragment-shader");
+  programGem7 = initShaders(gl, "vertex-shader-7", "fragment-shader");
+
+  //Establish thetaLoc
+  thetaLoc = gl.getUniformLocation(programGem5, "utheta");
+
+  //Establish "Gem Menu" Menu
+  document.getElementById("Choose A Gem" ).onclick = function(event) 
+  {
+    switch( event.target.index ) 
+    {
+      case 0:
+        console.debug("5-Sided Gem")
+        drawGem5 = true;
+        drawGem6 = false;
+        loadGem5();
+        break;
+      case 1:
+        console.debug("6-Sided Gem")
+        drawGem5 = false;
+        drawGem6 = true;
+        loadGem6();
+        break;
+      case 2:
+        console.debug("7-Sided Gem")
+        drawGem5 = false;
+        drawGem6 = false;
+        loadGem7();
+        break;
+    }
+  };
+
+  //Establish "Move Gem" Button
+  document.getElementById("Move Gem").onclick = function() 
+  {
+    console.log("pressed button");
+    moveGem = !moveGem;
+  }
+
+  render();
 }
 
 render = function()
 {
-    gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
-    //Draw chosen gem (if then statements) using correct shaders and data
+
+  //Draw chosen gem (if then statements) using correct shaders and data
+  requestAnimationFrame(render);
 }
