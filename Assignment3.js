@@ -11,13 +11,169 @@ Author: Finley Blakeman
 "use strict";
 
 // global variables
-var canvas;
-var gl;
+var render, canvas, gl;
 
 //global rotation variables
-//global color variables
-//gloabal shape variables (3)
+var theta = 0.0;
+var thetaLoc;
+var speed;
+
+//global color and point variables
+var colors = [];
+var points = [];
+
 //global program variables (3)
+var programGem5;
+var programGem6;
+var programGem7;
+
+var drawGem5 = true;
+var drawGem6 = false;
+var drawGem7 = false;
+
+function drawGem5() 
+{
+  points = [
+    vec2(0, 0),
+    vec2(0, 0.75),
+    vec2(0.75, 0),
+    vec2(0.5, -0.75),
+    vec2(-0.5, -0.75),
+    vec2(-0.75, 0),
+    vec2(0, 0.75)
+  ]
+
+  var r, b, g;
+
+  document.getElementById("redSlider").onchange = function(event) {
+    r = event.target.value;
+  };
+
+  document.getElementById("blueNearSlider").onchange = function(event) {
+    b = event.target.value;
+  };
+
+  document.getElementById("greenSlider").onchange = function(event) {
+    g = event.target.value;
+  };
+
+  colors = [
+    vec3(1.0, 1.0, 1.0),
+    vec3(r, b, g, 0.8),
+    vec3(r, b, g, 0.9),
+    vec3(r, b, g, 0.8),
+    vec3(r, b, g, 0.7),
+    vec3(r, b, g, 0.6),
+    vec3(r, b, g, 0.5),
+    vec3(r, b, g, 0.6),
+    vec3(r, b, g, 0.7)
+  ]
+
+  var bufferId = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW)
+
+  var positionLoc = gl.getAttribLocation(programGem5, "aPosition");
+  gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(positionLoc);
+}
+
+function drawGem6() 
+{
+  points = [
+    vec2(0, 0),
+    vec2(0.5, 0.75),
+    vec2(0.75, 0),
+    vec2(0.5, -0.75),
+    vec2(-0.5, -0.75),
+    vec2(-0.75, 0),
+    vec2(-0.5, 0.75),
+    vec2(0.5, 0.75)
+  ]
+
+  var r, b, g;
+
+  document.getElementById("redSlider").onchange = function(event) {
+    r = event.target.value;
+  };
+
+  document.getElementById("blueNearSlider").onchange = function(event) {
+    b = event.target.value;
+  };
+
+  document.getElementById("greenSlider").onchange = function(event) {
+    g = event.target.value;
+  };
+
+  colors = [
+    vec3(1.0, 1.0, 1.0),
+    vec3(r, b, g, 0.8),
+    vec3(r, b, g, 0.9),
+    vec3(r, b, g, 0.8),
+    vec3(r, b, g, 0.7),
+    vec3(r, b, g, 0.6),
+    vec3(r, b, g, 0.5),
+    vec3(r, b, g, 0.6),
+    vec3(r, b, g, 0.7)
+  ]
+
+  var bufferId = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW)
+
+  var positionLoc = gl.getAttribLocation(programGem5, "aPosition");
+  gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(positionLoc);
+}
+
+function drawGem7() 
+{
+  points = [
+    vec2(0, 0),
+    vec2(0, 0.75),
+    vec2(0.6, 0.5),
+    vec2(0.75, 0),
+    vec2(0.5, -0.5),
+    vec2(-0.5, -0.5),
+    vec2(0.75, 0),
+    vec2(-0.6, 0.5),
+    vec2(0, 0.75)
+  ]
+  
+  var r, b, g;
+
+  document.getElementById("redSlider").onchange = function(event) {
+    r = event.target.value;
+  };
+
+  document.getElementById("blueNearSlider").onchange = function(event) {
+    b = event.target.value;
+  };
+
+  document.getElementById("greenSlider").onchange = function(event) {
+    g = event.target.value;
+  };
+
+  colors = [
+    vec3(1.0, 1.0, 1.0),
+    vec3(r, b, g, 0.8),
+    vec3(r, b, g, 0.9),
+    vec3(r, b, g, 0.8),
+    vec3(r, b, g, 0.7),
+    vec3(r, b, g, 0.6),
+    vec3(r, b, g, 0.5),
+    vec3(r, b, g, 0.6),
+    vec3(r, b, g, 0.7)
+  ]
+
+  var bufferId = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW)
+
+  var positionLoc = gl.getAttribLocation(programGem5, "aPosition");
+  gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(positionLoc);
+}
 
 window.onload = function init()
 {
@@ -31,15 +187,12 @@ window.onload = function init()
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
     //Load Shaders and initialize attribute buffers
-    //vertices for 5 sided gem
-    //vertices for 6 sided gem
-    //vertices for 7 sided gem
-    //Establish shaders (programs), button, menu, color slider, and speed (theta)
+    //Establish shaders (programs), button, menu, and speed (theta)
     
     render();
 }
 
-function render()
+render = function()
 {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
